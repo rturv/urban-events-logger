@@ -1,67 +1,148 @@
-# logger-quarkus
+# Logger de Eventos Urbanos con Quarkus y Kafka
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+Este proyecto es un logger de eventos urbanos desarrollado con Quarkus y Apache Kafka. Forma parte de una serie de ejercicios de formación sobre eventos y mensajería asíncrona utilizando Kafka.
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+## Descripción
 
-## Running the application in dev mode
+El logger consume mensajes de eventos urbanos desde un topic de Kafka y los registra en un archivo de logs. Es un ejemplo práctico de cómo integrar Quarkus con Kafka para procesar eventos en tiempo real.
 
-You can run your application in dev mode that enables live coding using:
+## Tecnologías Utilizadas
 
-```shell script
+- **Quarkus**: Framework Java para aplicaciones nativas en la nube.
+- **Apache Kafka**: Plataforma de streaming de eventos.
+- **Maven**: Herramienta de gestión de dependencias y construcción.
+- **Java 17+**: Versión de Java requerida.
+
+## Requisitos Previos
+
+- Java 17 o superior instalado.
+- Apache Maven 3.6+.
+- Una instancia de Kafka corriendo (local o remota).
+- Conocimientos básicos de Java y Kafka.
+
+## Instalación
+
+1. Clona el repositorio:
+   ```bash
+   git clone <url-del-repositorio>
+   cd logger-quarkus
+   ```
+
+2. Instala las dependencias:
+   ```bash
+   ./mvnw clean install
+   ```
+
+## Configuración
+
+Edita el archivo `src/main/resources/application.properties` para configurar la conexión a Kafka:
+
+```properties
+# Configuración de Kafka
+mp.messaging.incoming.urban-events.connector=smallrye-kafka
+mp.messaging.incoming.urban-events.topic=urban-events
+mp.messaging.incoming.urban-events.bootstrap.servers=localhost:9092
+mp.messaging.incoming.urban-events.group.id=urban-events-logger
+mp.messaging.incoming.urban-events.auto.offset.reset=earliest
+
+# Configuración de logging
+quarkus.log.file.enable=true
+quarkus.log.file.path=logs/urban-events-logger.log
+quarkus.log.file.rotation.max-file-size=10M
+quarkus.log.file.rotation.max-backup-index=5
+```
+
+## Ejecución
+
+### Modo Desarrollo
+
+Para ejecutar en modo desarrollo con recarga en vivo:
+
+```bash
 ./mvnw quarkus:dev
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+La aplicación estará disponible en `http://localhost:8080`. La interfaz de desarrollo de Quarkus en `http://localhost:8080/q/dev/`.
 
-## Packaging and running the application
+### Empaquetado y Ejecución
 
-The application can be packaged using:
+1. Empaqueta la aplicación:
+   ```bash
+   ./mvnw package
+   ```
 
-```shell script
-./mvnw package
-```
+2. Ejecuta el JAR:
+   ```bash
+   java -jar target/quarkus-app/quarkus-run.jar
+   ```
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+### Ejecutable Nativo
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+Para crear un ejecutable nativo:
 
-If you want to build an _über-jar_, execute the following command:
-
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
-```
-
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using:
-
-```shell script
+```bash
 ./mvnw package -Dnative
 ```
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
+O en un contenedor si no tienes GraalVM:
 
-```shell script
+```bash
 ./mvnw package -Dnative -Dquarkus.native.container-build=true
 ```
 
-You can then execute your native executable with: `./target/logger-quarkus-1.0.0-SNAPSHOT-runner`
+Ejecuta con:
+```bash
+./target/logger-quarkus-1.0.0-SNAPSHOT-runner
+```
 
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
+## Uso
 
-## Related Guides
+Una vez ejecutándose, el logger se conectará automáticamente al topic `urban-events` de Kafka y comenzará a consumir mensajes. Los eventos se registrarán en el archivo `logs/urban-events-logger.log`.
 
-- Messaging - Kafka Connector ([guide](https://quarkus.io/guides/kafka-getting-started)): Connect to Kafka with Reactive Messaging
+Ejemplo de mensaje de evento esperado:
+```json
+{
+  "id": "12345",
+  "type": "traffic_incident",
+  "location": "Calle Mayor, 10",
+  "timestamp": "2023-10-01T12:00:00Z",
+  "description": "Accidente de tráfico"
+}
+```
 
-## Provided Code
+## Estructura del Proyecto
 
-### Messaging codestart
+```
+src/
+├── main/
+│   ├── java/
+│   │   └── com/urbanevents/logger/
+│   │       └── EventLogger.java
+│   └── resources/
+│       └── application.properties
+└── test/
+    └── java/
+        └── com/urbanevents/logger/
+            └── MyMessagingApplicationTest.java
+```
 
-Use Quarkus Messaging
+## Contribución
 
-[Related Apache Kafka guide section...](https://quarkus.io/guides/kafka-reactive-getting-started)
+Este proyecto es parte de ejercicios de formación. Para contribuir:
+
+1. Fork el repositorio.
+2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`).
+3. Commit tus cambios (`git commit -am 'Añade nueva funcionalidad'`).
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`).
+5. Abre un Pull Request.
+
+## Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+
+## Recursos Adicionales
+
+- [Documentación de Quarkus](https://quarkus.io/)
+- [Guía de Kafka con Quarkus](https://quarkus.io/guides/kafka-getting-started)
+- [Apache Kafka Documentation](https://kafka.apache.org/documentation/)
 
